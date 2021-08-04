@@ -20,7 +20,8 @@ var (
 	Port string
 
 	DbType     string
-	DbAddr     string
+	DbHost     string
+	DbPort     string
 	DbName     string
 	DbUser     string
 	DbPassword string
@@ -46,25 +47,26 @@ func init() {
 		log.Fatalln("Read Configure From File Failed...", err)
 	}
 
-	LoadServer(file)
-	LoadDB(file)
-	LoadOthers(file)
+	loadServer(file)
+	loadDB(file)
+	loadOthers(file)
 }
 
-func LoadServer(file *ini.File) {
+func loadServer(file *ini.File) {
 	Host = file.Section("server").Key("host").String()
 	Port = file.Section("server").Key("port").String()
 }
 
-func LoadDB(file *ini.File) {
+func loadDB(file *ini.File) {
 	DbType = file.Section("db").Key("db_type").String()
-	DbAddr = file.Section("db").Key("db_addr").String()
+	DbHost = file.Section("db").Key("db_host").String()
+	DbPort = file.Section("db").Key("db_port").String()
 	DbName = file.Section("db").Key("db_name").String()
 	DbUser = file.Section("db").Key("db_user").String()
 	DbPassword = file.Section("db").Key("db_password").String()
 }
 
-func LoadOthers(file *ini.File) {
+func loadOthers(file *ini.File) {
 	RawUrl = file.Section("others").Key("raw_url").String()
 	Contract = file.Section("others").Key("contract").String()
 	SanaAmount = file.Section("others").Key("sana_amount").String()

@@ -3,21 +3,29 @@ package datastorage
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"time"
 	"webfaucetp/utils"
 	"webfaucetp/utils/errmsg"
+
+	"database/sql"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
+var SqlDb *sql.DB
 var db *gorm.DB
 var err error
 
 //github.com/ethereum/go-ethereum
 func InitMysql() error {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		utils.DbUser, utils.DbPassword, utils.DbHost, utils.DbPort, utils.DbName)
+	SqlDb, err = sql.Open(utils.DbType, dsn)
 	db, err = gorm.Open(mysql.New(mysql.Config{
-		DriverName:                utils.DbType,
-		DSN:                       utils.DbAddr,
+		// DriverName:                utils.DbType,
+		Conn:                      SqlDb,
 		SkipInitializeWithVersion: false,
 		DefaultStringSize:         256,
 		DefaultDatetimePrecision:  nil,
@@ -29,6 +37,11 @@ func InitMysql() error {
 	if err != nil {
 		return err
 	}
+
+	db.AutoMigrate(&SprinkleRecord{})
+	SqlDb.SetMaxIdleConns(10)
+	SqlDb.SetMaxOpenConns(100)
+	SqlDb.SetConnMaxLifetime(time.Hour)
 
 	return nil
 }
